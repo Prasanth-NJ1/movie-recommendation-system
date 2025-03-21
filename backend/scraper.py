@@ -79,7 +79,5 @@ movies = get_movies_with_genres(username)
 
 if movies:
     print("\n=== Movies Fetched & Stored in MongoDB ===")
-    for movie in movies:
-        print(f"{movie['title']} | Genres: {', '.join(movie['genres']) if movie['genres'] else 'None'} | {movie['url']}")
 else:
     print("No movies found.")
