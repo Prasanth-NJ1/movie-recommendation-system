@@ -16,7 +16,7 @@ def get_movie_recommendations(movie_title, page=1, limit=10):
 
     if not movie:
         print(f"❌ Debug: Movie '{movie_title}' not found in database.")
-        return {"error": "Movie not found."}
+        return {"error": "Your Movie is not found in our database."}
 
     # Extract genres (Fix the key name to match the DB)
     genres = movie.get("genre", [])  # Use "genre", NOT "genres"

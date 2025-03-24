@@ -1,85 +1,74 @@
 import requests
-from bs4 import BeautifulSoup
+import xml.etree.ElementTree as ET
 import time
-from db_config import get_db
+import sys
+import os
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-}
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from db_config import get_scraped_movies_collection
+from omdb_tmdb import get_movie_genres  # Function to fetch genres
 
 BASE_URL = "https://letterboxd.com"
 
-def get_movies_with_genres(username):
-    url = f"{BASE_URL}/{username}/films/"
-    session = requests.Session()
+def fetch_letterboxd_rss(username):
+    """Fetch movies from Letterboxd RSS feed."""
+    rss_url = f"{BASE_URL}/{username}/rss/"
+    response = requests.get(rss_url)
 
-    print(f"\nFetching movies for: {username} ({url})")
-    response = session.get(url, headers=HEADERS)
-    
     if response.status_code != 200:
-        print(f"Error {response.status_code}: Unable to fetch data.")
+        print(f"Error {response.status_code}: Unable to fetch RSS feed.")
         return []
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    movie_tags = soup.find_all("div", class_="film-poster")
-    if not movie_tags:
-        print("No movies found.")
-        return []
-
+    root = ET.fromstring(response.content)
     movies = []
-    db=get_db()
-    movies_collection=db["movies"]
-    
-    for movie_tag in movie_tags:
-        title = movie_tag.img["alt"].strip() if movie_tag.img else "Unknown"
-        movie_slug = movie_tag["data-film-slug"]
-        movie_url = f"{BASE_URL}/film/{movie_slug}/"
-        genre_url = movie_url + "genres/"
 
-        genres = get_movie_genres(session, genre_url)
-        
-        movie_data = {
-            "title": title,
-            "url": movie_url,
-            "genres": genres
-        }
+    for item in root.findall(".//item"):
+        title = item.find("title").text
+        link = item.find("link").text
 
-        movies_collection.update_one(
-            {"title": title},  
-            {"$set": movie_data},  
-            upsert=True
-        )
-        movies.append(movie_data)
+        # Exclude "Theatre" entries
+        if "Theatre" in title:
+            continue
 
-        print(f"Stored: {title} - Genres: {', '.join(genres) if genres else 'None'}")
-        time.sleep(1)
+        movies.append({"title": title, "url": link, "username": username})
 
     return movies
 
-def get_movie_genres(session, genre_url):
-    """ Fetches genres from the genre page of a movie """
-    try:
-        response = session.get(genre_url, headers=HEADERS)
-        if response.status_code != 200:
-            return []
+def store_movies_in_db(username, movies):
+    """Store movies in MongoDB with genres."""
+    collection = get_scraped_movies_collection()
 
-        soup = BeautifulSoup(response.text, "html.parser")
-        genre_links = soup.select('a[href*="/films/genre/"]')
-        genres = [link.text.strip() for link in genre_links]
+    for movie in movies:
+        genres = get_movie_genres(movie["title"])  # Fetch genres
+        if not genres:
+            continue  # Skip movies without genres
 
-        return genres
-    except Exception as e:
-        print(f"Error fetching genres: {e}")
+        movie_data = {
+            "username": username,
+            "title": movie["title"],
+            "url": movie["url"],
+            "genres": genres
+        }
+
+        collection.update_one(
+            {"username": username, "title": movie["title"]},
+            {"$set": movie_data},
+            upsert=True
+        )
+
+        print(f"📌 Stored: {movie['title']} - Genres: {', '.join(genres)}")
+
+def update_watched_movies(username):
+    """Fetch movies via RSS, get genres, and update database."""
+    movies = fetch_letterboxd_rss(username)
+    if not movies:
+        print("⚠️ No new movies found via RSS.")
         return []
 
-# 🔹 Take username as input
-username = input("Enter Letterboxd username: ").strip()
-movies = get_movies_with_genres(username)
+    store_movies_in_db(username, movies)
+    return movies
 
-if movies:
-    print("\n=== Movies Fetched & Stored in MongoDB ===")
-    for movie in movies:
-        print(f"{movie['title']} | Genres: {', '.join(movie['genres']) if movie['genres'] else 'None'} | {movie['url']}")
-else:
-    print("No movies found.")
+# 🔹 Usage Example
+if __name__ == "__main__":
+    username = input("Enter Letterboxd username: ").strip()
+    update_watched_movies(username)
