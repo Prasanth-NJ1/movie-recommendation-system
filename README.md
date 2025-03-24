@@ -19,7 +19,7 @@ Movie-Based Recommendations – Users enter a movie title, and similar movies ar
 ## Example Usage
 Run the following commands in your command prompt after the Flask started running 
 
-`curl http://127.0.0.1:8090/recommend/letterboxd?username=your_suername_here`
+`curl http://127.0.0.1:8090/recommend/letterboxd?username=your_username_here`
 
 `curl http://127.0.0.1:8090/recommend/genre?genre=Action`
 
