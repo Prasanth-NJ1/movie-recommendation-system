@@ -7,9 +7,9 @@ A Flask-based movie recommendation system that suggests movies based on:
 It fetches movie data from Letterboxd, OMDb, and TMDb and stores it in MongoDB for fast recommendations.
 
 ## Features
-Letterboxd-Based Recommendations – Fetches user watch history and suggests movies based on most-watched genres.
-Genre-Based Recommendations – Users enter a genre (e.g., "Drama"), and the system recommends highly-rated movies.
-Movie-Based Recommendations – Users enter a movie title, and similar movies are suggested.
+1. Letterboxd-Based Recommendations – Fetches user watch history and suggests movies based on most-watched genres.
+2. Genre-Based Recommendations – Users enter a genre (e.g., "Drama"), and the system recommends highly-rated movies.
+3. Movie-Based Recommendations – Users enter a movie title, and similar movies are suggested.
 
 ## Setup Instructions  
 1. Clone the repository `https://github.com/Prasanth-NJ1/movie-recommendation-system.git`
@@ -19,9 +19,8 @@ Movie-Based Recommendations – Users enter a movie title, and similar movies ar
 ## Example Usage
 Run the following commands in your command prompt after the Flask started running 
 
-`curl http://127.0.0.1:8090/recommend/letterboxd?username=your_username_here`
+`curl http://127.0.0.1:8090/recommend/letterboxd?username=your_suername_here`
 
 `curl http://127.0.0.1:8090/recommend/genre?genre=Action`
 
 `curl http://127.0.0.1:8090/recommend/movie?title=Pusher`
-
