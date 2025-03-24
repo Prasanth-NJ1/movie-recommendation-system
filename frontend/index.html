@@ -1,19 +1,30 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Recommendation</title>
+    <title>Movie-Mate</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Movie Recommendation System</h1>
-        <div class="buttons">
-            <button onclick="location.href='genre.html'">Genre-Based Recommendation</button>
-            <button onclick="location.href='letterboxd.html'">Letterboxd-Based Recommendation</button>
-            <button onclick="location.href='movie.html'">Movie-Based Recommendation</button>
+        <h1 class="title">Movie-Mate</h1>
+        <div class="cards">
+            <div class="card">
+                <h2>Letterboxd</h2>
+                <p>This feature analyzes your most-watched genre on Letterboxd and recommends personalized movies based on your favorite genre.</p>
+                <button onclick="location.href='letterboxd.html'">Click Here!</button>
+            </div>
+            <div class="card">
+                <h2>Genre</h2>
+                <p>recommends movies based on your selected genres, allowing you to explore films that matches your preferences.</p>
+                <button onclick="location.href='genre.html'">Click Here!</button>
+            </div>
+            <div class="card">
+                <h2>Movie</h2>
+                <p>recommends similar movies based on the genre of the movie you enter, helping you discover related films.</p>
+                <button onclick="location.href='movie.html'">Click Here!</button>
+            </div>
         </div>
     </div>
 </body>

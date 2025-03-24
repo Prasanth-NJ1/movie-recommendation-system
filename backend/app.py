@@ -9,7 +9,6 @@ import subprocess
 app = Flask(__name__)
 CORS(app) # Allow frontend requests
 
-# 🎭 Genre-based Recommendation
 @app.route('/recommend/genre', methods=['GET'])
 def recommend_by_genre():
     genre = request.args.get('genre')
@@ -18,7 +17,6 @@ def recommend_by_genre():
         return jsonify({"error": "Genre is required"}), 400
     return jsonify(get_movies_by_genre(genre, page=page))
 
-# 🎬 Movie-based Recommendation
 @app.route('/recommend/movie', methods=['GET'])
 def recommend_by_movie():
     title = request.args.get('title')
@@ -27,7 +25,6 @@ def recommend_by_movie():
         return jsonify({"error": "Movie title is required"}), 400
     return jsonify(get_movie_recommendations(title, page=page))
 
-  # ✅ To run scraper.py
 
 @app.route("/recommend/letterboxd", methods=["GET"])
 def recommend_by_letterboxd():
@@ -36,7 +33,6 @@ def recommend_by_letterboxd():
     if not username:
         return jsonify({"error": "Username is required"}), 400
 
-    # ✅ Check if user data exists in the database
     movie_collection = get_scraped_movies_collection()
     user_movies = list(movie_collection.find({"username": username}))
 
@@ -47,12 +43,12 @@ def recommend_by_letterboxd():
         except subprocess.CalledProcessError as e:
             return jsonify({"error": f"Scraper failed: {str(e)}"}), 500
 
-        # ✅ Re-fetch after scraping
+        #Re-fetch after scraping
         user_movies = list(movie_collection.find({"username": username}))
         if not user_movies:
             return jsonify({"error": "No data found after scraping. Please check username."}), 404
 
-    # ✅ Proceed with recommendation logic
+    
     most_watched_genre = get_most_watched_genre(username)
 
     if not most_watched_genre:

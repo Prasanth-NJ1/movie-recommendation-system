@@ -10,7 +10,7 @@ def get_movies_by_genre(genre, limit=10, page=1):
     collection = get_movie_collection()  #  Get correct collection
     skip = (page - 1) * limit  # Pagination offset
     
-    query = {"genre": genre, "rating": {"$gte": 7}}
+    query = {"genre": {"$regex": f"^{genre}$", "$options": "i"}, "rating": {"$gte": 7}}
     projection = {"_id": 0, "title": 1, "year": 1, "genre": 1, "rating": 1}
 
     movies = list(collection.find(query, projection).sort("rating", -1).skip(skip).limit(limit))  

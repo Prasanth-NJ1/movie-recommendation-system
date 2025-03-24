@@ -1,4 +1,3 @@
-<!-- letterboxd.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +7,32 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Letterboxd-Based Recommendation</h1>
-        <input type="text" id="letterboxd-input" placeholder="Enter your Letterboxd username">
-        <button onclick="getLetterboxdRecommendations()">Get Recommendations</button>
-        <div id="results"></div>
-        <button onclick="location.href='index.html'">Back to Home</button>
+   
+
+    <!-- Home Button -->
+    <div class="title-container">
+        <h1 class="title">Letterboxd
+        </h1>
+        <button class="home-button" onclick="location.href='index.html'">Home</button>
     </div>
+
+    <div class="form-container">
+        <input type="text" id="letterboxd-input" placeholder="Enter your Letterboxd username">
+        <button onclick="getLetterboxdRecommendations()">Submit</button>
+    </div>
+
+    <div id="results"></div>
+
     <script src="script.js"></script>
+
+    <script>
+        // Trigger function on "Enter" key press
+        document.getElementById("letterboxd-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent default form submission
+                getLetterboxdRecommendations();
+            }
+        });
+    </script>
 </body>
 </html>

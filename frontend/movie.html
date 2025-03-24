@@ -1,4 +1,3 @@
-<!-- movie.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +7,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Movie-Based Recommendation</h1>
-        <input type="text" id="movie-input" placeholder="Enter a movie name">
-        <button onclick="getMovieRecommendations()">Get Recommendations</button>
-        <div id="results"></div>
-        <button onclick="location.href='index.html'">Back to Home</button>
+    <!-- Title and Home Button Container -->
+    <div class="title-container">
+        <h1 class="title">Movie-Based</h1>
+        <button class="home-button" onclick="location.href='index.html'">Home</button>
     </div>
+
+    <!-- Input Form -->
+    <div class="form-container">
+        <input type="text" id="movie-input" placeholder="Enter a movie name">
+        <button onclick="getMovieRecommendations()">Submit</button>
+    </div>
+
+    <div id="results"></div>
+
     <script src="script.js"></script>
+
+    <script>
+        // Trigger function on "Enter" key press
+        document.getElementById("movie-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent default form submission
+                getMovieRecommendations();
+            }
+        });
+    </script>
 </body>
 </html>
