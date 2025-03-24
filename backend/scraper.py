@@ -70,23 +70,22 @@ def store_movies_in_db(username, movies):
             upsert=True
         )
 
-        print(f"📌 Stored: {movie['title']} - Genres: {', '.join(genres)}")
+        print(f"Stored: {movie['title']} - Genres: {', '.join(genres)}")
 
 def update_watched_movies(username):
     """Fetch movies via RSS, get genres, and update database."""
     movies = fetch_letterboxd_rss(username)
     if not movies:
-        print("⚠️ No new movies found via RSS.")
+        print("No new movies found via RSS.")
         return {"error": "No movies found for this user."}  # Return error dict
 
     store_movies_in_db(username, movies)
     return movies
 
-# ✅ Get username from command-line arguments
 if len(sys.argv) > 1:
     username = sys.argv[1].strip().replace('"', '')  # Remove extra quotes
 else:
-    print("❌ No username provided.")
-    sys.exit(1)  # Exit with error
+    print("No username provided.")
+    sys.exit(1)  
 
 update_watched_movies(username)

@@ -16,7 +16,6 @@ ENDPOINTS = [
     "https://api.themoviedb.org/3/discover/movie"
 ]
 
-# Fetch movies from TMDb
 def fetch_movies():
     movies = set()  # Use set to avoid duplicates
 
@@ -38,7 +37,7 @@ def fetch_movies():
                 
                 print(f"Fetched {len(movies)} movies so far...")
                 if len(movies) >= MOVIE_LIMIT:
-                    return list(movies)  # Stop if we reach 8000
+                    return list(movies)  
             else:
                 print(f"API Error: {response.status_code}")
             time.sleep(1)  # Avoid rate limiting
@@ -54,6 +53,5 @@ def save_to_csv(movies):
     
     print(f"CSV Created: {len(movies)} movies saved in '{CSV_FILENAME}'")
 
-# Run the process
 movies_data = fetch_movies()
 save_to_csv(movies_data)

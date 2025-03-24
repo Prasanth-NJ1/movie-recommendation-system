@@ -2,7 +2,7 @@ import requests
 
 TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
 
-# Genre ID → Genre Name Mapping (fetch once and reuse)
+
 GENRE_MAP = {}
 
 def get_tmdb_genre_map():
@@ -16,22 +16,20 @@ def get_tmdb_genre_map():
 def fetch_from_tmdb(title, year=None):
     """Fetch movie genres from TMDb API with improved accuracy."""
     if not GENRE_MAP:
-        get_tmdb_genre_map()  # Fetch genre map if not already done
+        get_tmdb_genre_map()  
 
     search_url = f"https://api.themoviedb.org/3/search/movie?query={title}&api_key={TMDB_API_KEY}"
     if year:
-        search_url += f"&year={year}"  # Filter by year if available
+        search_url += f"&year={year}"  
 
     search_response = requests.get(search_url).json()
 
     if not search_response.get("results"):
         return []
 
-    # Select the best-matching result
     movie = search_response["results"][0]  # First result is assumed best match
     movie_id = movie["id"]
 
-    # Fetch detailed movie info
     details_url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
     details_response = requests.get(details_url).json()
 
@@ -40,4 +38,4 @@ def fetch_from_tmdb(title, year=None):
 
 def get_movie_genres(title):
     """Fetch genres for a given movie title from TMDb."""
-    return fetch_from_tmdb(title)  # Uses the existing TMDb function
+    return fetch_from_tmdb(title)  

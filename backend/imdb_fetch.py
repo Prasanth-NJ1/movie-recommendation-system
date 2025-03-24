@@ -4,19 +4,16 @@ from pymongo import MongoClient
 import time
 import pandas as pd
 
-# MongoDB Atlas Connection (Replace with your credentials)
 client = MongoClient("mongodb+srv://prasanthnj72:Prasanth%4072@moviecluster.qd8li.mongodb.net/?retryWrites=true&w=majority&appName=MovieCluster")
 db = client["movies_database"]
 collection = db["imdb_movies"]
 
-# OMDb API Key
 OMDB_API_KEY = "16632563"  # Replace with your API key
 OMDB_URL = "http://www.omdbapi.com"
 
-df = pd.read_csv("tmdb_movies.csv")  # Ensure this file contains at least 8000 movies
-movies = df["Title"].tolist()  # Extract movie titles
+df = pd.read_csv("tmdb_movies.csv")  
+movies = df["Title"].tolist()  
 
-# Function to fetch movie details
 def fetch_movie_details(title):
     params = {"t": title, "apikey": OMDB_API_KEY}
     response = requests.get(OMDB_URL, params=params)
@@ -26,12 +23,12 @@ def fetch_movie_details(title):
             return {
                 "title": data.get("Title"),
                 "year": int(data.get("Year", "0").replace("–", "-").split("-")[0]),  # Extract only start year
-                "genre": data.get("Genre", "").split(", ") if data.get("Genre") else [],  # Convert to list
+                "genre": data.get("Genre", "").split(", ") if data.get("Genre") else [],  
                 "rating": float(data.get("imdbRating", 0)) if data.get("imdbRating") != "N/A" else None
             }
     return None
 
-# Insert movies into MongoDB
+
 count = 0
 for movie in movies:
     # Check if movie already exists

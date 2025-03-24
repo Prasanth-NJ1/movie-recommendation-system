@@ -34,9 +34,9 @@ function getLetterboxdRecommendations() {
 }
 
 function getMovieRecommendations() {
-    let movieTitle = document.getElementById('movie-input').value;  // ✅ Get input value
+    let movieTitle = document.getElementById('movie-input').value;  
 
-    if (!movieTitle) {  // ✅ Check if input is empty
+    if (!movieTitle) {  
         console.error("Error: No movie title provided");
         return;
     }
@@ -48,7 +48,7 @@ function getMovieRecommendations() {
             }
             return response.json();
         })
-        .then(data => displayResults(data))  // ✅ Pass data to display function
+        .then(data => displayResults(data))  
         .catch(error => console.error("Fetch error:", error));
 }
 
