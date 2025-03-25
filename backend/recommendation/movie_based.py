@@ -1,77 +1,92 @@
 import sys
 import os
 
-
+# Add backend folder to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from db_config import get_db  
+from db_config import get_db
 
 
 def get_movie_recommendations(movie_title, page=1, limit=10):
     db = get_db()
     collection = db["imdb_movies"]
-    
-    
+
+    # Find the movie in the database
     movie = collection.find_one({"title": {"$regex": f"^{movie_title.strip()}$", "$options": "i"}})
 
     if not movie:
-        print(f"Debug: Movie '{movie_title}' not found in database.")
-        return {"error": "Your Movie is not found in our database."}
+        return {
+            "current_page": page,
+            "next_page": None,
+            "previous_page": page - 1 if page > 1 else None,
+            "results": [],
+            "error": "Movie not found in the database."
+        }
 
-    
-    genres = movie.get("genre", [])  
-    
+    genres = movie.get("genre", [])
+
     if not genres:
-        print(f"Debug: No genres found for movie '{movie_title}'")
-        return {"error": "No genres found for this movie."}
+        return {
+            "current_page": page,
+            "next_page": None,
+            "previous_page": page - 1 if page > 1 else None,
+            "results": [],
+            "error": "No genres found for this movie."
+        }
 
-    print(f"Debug: Genres for '{movie_title}': {genres}")
-
-    # Find movies with matching genres, exclude the input movie, and sort by IMDb rating
-    recommendations = collection.find(
+    # Find movies with at least 2 matching genres, excluding the input movie
+    recommendations = list(collection.find(
         {"genre": {"$in": genres}, "title": {"$ne": movie_title}},
         {"_id": 0, "title": 1, "year": 1, "genre": 1, "rating": 1}
-    ).sort("rating", -1).skip((page - 1) * limit).limit(limit)
+    ))
 
-    recommended_movies = list(recommendations)
-    
-    if not recommended_movies:
-        print(f"Debug: No recommendations found for genres {genres}")
-        return {"error": "No recommendations found."}
+    # Sort movies: First by matching genre count, then by IMDb rating
+    recommendations = sorted(
+        recommendations,
+        key=lambda x: (-len(set(x.get("genre", [])) & set(genres)), -float(x["rating"]) if x["rating"] else 0)
+    )
 
-    print(f"Debug: Found {len(recommended_movies)} recommendations.")
-
-    formatted_results = [
-        f"Title: {movie['title']}\nYear: {movie['year']}\nGenre: {', '.join(movie['genre'])}\niMDb rating: {movie['rating']}"
-        for movie in recommended_movies
-    ]
+    # Paginate results
+    start_index = (page - 1) * limit
+    end_index = start_index + limit
+    recommended_movies = recommendations[start_index:end_index]
 
     return {
         "current_page": page,
-        "next_page": page + 1,
+        "next_page": page + 1 if end_index < len(recommendations) else None,
         "previous_page": page - 1 if page > 1 else None,
-        "results": formatted_results
+        "results": [
+            {
+                "title": movie["title"],
+                "year": movie["year"],
+                "genre": movie["genre"],
+                "rating": movie["rating"]
+            }
+            for movie in recommended_movies
+        ]
     }
 
-# Example usage
+
+# 🔹 Example usage
 if __name__ == "__main__":
     movie_title = input("Enter a movie name: ")
-    page = 1  # Default to page 1
+    page = 1
     db = get_db()
     print(f"Connected to Database: {db.name}")
 
     while True:
         response = get_movie_recommendations(movie_title, page)
-        if "error" in response:
+        
+        if "error" in response and not response["results"]:
             print(response["error"])
             break
-        
+
         for movie in response["results"]:
-            print(movie + "\n")
-        
+            print(f"{movie['title']} ({movie['year']}) - {', '.join(movie['genre'])} | IMDb: {movie['rating']}")
+
         # Pagination control
         next_prev = input("Enter 'n' for next page, 'p' for previous page, or 'q' to quit: ").strip().lower()
-        if next_prev == 'n':
+        if next_prev == 'n' and response["next_page"]:
             page = response["next_page"]
         elif next_prev == 'p' and response["previous_page"]:
             page = response["previous_page"]

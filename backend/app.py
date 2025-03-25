@@ -9,6 +9,12 @@ import subprocess
 app = Flask(__name__)
 CORS(app) # Allow frontend requests
 
+# Function to paginate results
+def paginate_list(items, page, per_page=5):
+    start = (page - 1) * per_page
+    end = start + per_page
+    return items[start:end], len(items)
+
 @app.route('/recommend/genre', methods=['GET'])
 def recommend_by_genre():
     genre = request.args.get('genre')
@@ -29,6 +35,8 @@ def recommend_by_movie():
 @app.route("/recommend/letterboxd", methods=["GET"])
 def recommend_by_letterboxd():
     username = request.args.get("username")
+    page=int(request.args.get("page",1))
+    
     
     if not username:
         return jsonify({"error": "Username is required"}), 400
@@ -54,10 +62,17 @@ def recommend_by_letterboxd():
     if not most_watched_genre:
         return jsonify({"error": "No genre data found"}), 404
 
-    recommendations = get_movies_by_genre(most_watched_genre)["results"]
-    
-    return jsonify({"username": username, "genre": most_watched_genre, "recommendations": recommendations})
+    genre_response = get_movies_by_genre(most_watched_genre, page=page)
 
+    return jsonify({
+        "username": username,
+        "genre": most_watched_genre,
+        "recommendations": genre_response["results"],
+        "current_page": genre_response["current_page"],
+        "total_pages": genre_response["total_pages"],
+        "previous_page": genre_response["previous_page"],
+        "next_page": genre_response["next_page"]
+    })
 @app.route("/")
 def home():
     return "Flask server is running!"

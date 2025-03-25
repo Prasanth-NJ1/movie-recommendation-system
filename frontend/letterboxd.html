@@ -6,23 +6,27 @@
     <title>Letterboxd Recommendation</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
    
 
-    <!-- Home Button -->
     <div class="title-container">
-        <h1 class="title">Letterboxd
-        </h1>
-        <button class="home-button" onclick="location.href='index.html'">Home</button>
+        <!-- Home button on the left -->
+        <a href="index.html" class="home-button">
+            <img src="assets/images/home-button.png" alt="Home" class="home-button-image">
+        </a>   
+    
+        <!-- Title in the center -->
+        <h1 class="title">Letterboxd</h1>
     </div>
-
+    
     <div class="form-container">
         <input type="text" id="letterboxd-input" placeholder="Enter your Letterboxd username">
         <button onclick="getLetterboxdRecommendations()">Submit</button>
     </div>
 
-    <div id="results"></div>
-
+    <div id="results"></div> 
+    <div id="pagination-container"></div>
     <script src="script.js"></script>
 
     <script>
