@@ -109,32 +109,31 @@ body {
 }
 
 
-
 /* Title and Home Button Container */
 .title-container {
     display: flex;
     align-items: center;
-    justify-content: center; /* Spaces title and home button properly */
-    width: 90%; /* Make it responsive */
+    justify-content: center; 
+    width: 90%; 
     padding: 10px 0;
     position: relative;
 }
 
 .home-button {
     position: absolute;
-    left: 0; /* Sticks it to the left */
+    left: 0; 
     display: flex;
     align-items: center;
 }
 
 .home-button-container {
     display: flex;
-    justify-content: flex-start; /* Moves home button to the left */
+    justify-content: flex-start; 
     width: 90%;
 }
 
 .home-button-image {
-    width: 40px; /* Adjust size */
+    width: 40px;
     height: 40px;
     left: 0px;
     position: absolute;
@@ -146,6 +145,8 @@ body {
 .home-button-image:hover {
     transform: scale(1.1);
 }
+
+/*Results Table */
 
 .results-container {
     width: 95%;
@@ -173,7 +174,7 @@ body {
 }
 
 #results-table th {
-    background-color: #222; /* Darker background for headers */
+    background-color: #222; 
     color: white;
     font-weight: bold;
     text-align: center;
@@ -186,12 +187,6 @@ body {
 #results-table tr:hover {
     background-color: #e0e0e0;
 }
-
-/* Ensure text in the table is well-aligned */
-/* #results-table td {
-    font-size: 16px;
-    vertical-align: middle;
-} */
 
 /* Adjust for small screens */
 @media (max-width: 600px) {
@@ -210,7 +205,7 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 20px;
-    gap: 10px; /* Space between buttons */
+    gap: 10px; 
 }
 
 /* Pagination Buttons */

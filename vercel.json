@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "builds": [
+        {"src": "wsgi.py", "use": "@vercel/python"},
+        {"src": "frontend/**", "use": "@vercel/static"}
+    ],
+    "routes": [
+        {"src": "/api/(.*)", "dest": "wsgi.py"},
+        {"src": "/(.*)", "dest": "frontend/$1"}
+    ],
+    "includeFiles": [
+        "wsgi.py",
+        "app.py",
+        "requirements.txt",
+        "frontend/**",
+        "recommendation/**",
+        "data/**"
+    ],
+    "ignoreFiles": [
+        "venv/**",
+        ".gitignore",
+        ".vscode/**",
+        "__pycache__/**"
+    ]
+}

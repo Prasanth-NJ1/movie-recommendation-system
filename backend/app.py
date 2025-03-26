@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from recommendation.genre_based import get_movies_by_genre
 from recommendation.movie_based import get_movie_recommendations
-from recommendation.letterboxd_based import get_scraped_movies_collection, get_most_watched_genre, recommend_movies_from_db, recommend_movies_from_tmdb  # ✅ Import functions
+from recommendation.letterboxd_based import get_scraped_movies_collection, get_most_watched_genre, recommend_movies_from_db, recommend_movies_from_tmdb  
 import requests
 import subprocess
 
@@ -45,7 +45,7 @@ def recommend_by_letterboxd():
     user_movies = list(movie_collection.find({"username": username}))
 
     if not user_movies:  # If no data exists, run scraper
-        print(f"🔄 Running scraper for new user: {username}")
+        print(f"Running scraper for new user: {username}")
         try:
             subprocess.run(["python", "scraper.py", username], check=True)
         except subprocess.CalledProcessError as e:

@@ -46,4 +46,4 @@ for movie in movies:
     if count >= 8000:
         break
 
-print(f"🎬 Done! {count} movies stored in MongoDB.")
+print(f"Done! {count} movies stored in MongoDB.")
