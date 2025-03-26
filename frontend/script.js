@@ -1,6 +1,6 @@
 let currentPage = 1; 
 
-const API_BASE_URL = "https://movie-recommendation-system-ln9itn2ml.vercel.app";
+const API_BASE_URL = "https://movie-recommendation-system-ten.vercel.app";
 
 // Function to fetch movie recommendations based on title
 function getMovieRecommendations() {
