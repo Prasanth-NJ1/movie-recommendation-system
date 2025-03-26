@@ -7,11 +7,5 @@
     "routes": [
         {"src": "/api/(.*)", "dest": "wsgi.py"},
         {"src": "/(.*)", "dest": "frontend/$1"}
-    ],
-    "ignoreFiles": [
-        "venv/**",
-        ".gitignore",
-        ".vscode/**",
-        "__pycache__/**"
     ]
 }
