@@ -5,5 +5,10 @@
     ],
     "routes": [
         { "src": "/(.*)", "dest": "wsgi.py" }
+    ],
+    "ignoreFiles": [
+        "venv/**",
+        "data/**",
+        "backend/__pycache__/**"
     ]
 }
