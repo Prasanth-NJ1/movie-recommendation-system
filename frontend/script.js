@@ -1,5 +1,7 @@
 let currentPage = 1; 
 
+const API_BASE_URL = "https://movie-recommendation-system-ln9itn2ml.vercel.app";
+
 // Function to fetch movie recommendations based on title
 function getMovieRecommendations() {
     let movieTitle = document.getElementById('movie-input').value.trim();
@@ -9,7 +11,7 @@ function getMovieRecommendations() {
         return;
     }
 
-    fetch(`http://127.0.0.1:8090/recommend/movie?title=${encodeURIComponent(movieTitle)}&page=${currentPage}`)
+    fetch(`${API_BASE_URL}/recommend/movie?title=${encodeURIComponent(movieTitle)}&page=${currentPage}`)
         .then(response => response.json())
         .then(data => displayResults(data))
         .catch(error => console.error("Fetch error:", error));
@@ -24,7 +26,7 @@ function getGenreRecommendations() {
         return;
     }
 
-    fetch(`http://127.0.0.1:8090/recommend/genre?genre=${encodeURIComponent(genre)}&page=${currentPage}`)
+    fetch(`${API_BASE_URL}/recommend/genre?genre=${encodeURIComponent(genre)}&page=${currentPage}`)
         .then(response => response.json())
         .then(data => displayResults(data))
         .catch(error => console.error("Fetch error:", error));
@@ -39,23 +41,22 @@ function getLetterboxdRecommendations() {
         return;
     }
 
-    fetch(`http://127.0.0.1:8090/recommend/letterboxd?username=${encodeURIComponent(username)}&page=${currentPage}`)
-    .then(response => response.json())
-    .then(data => {
-        console.log("Movies data:", data); 
-        if (data.error) {
-            displayError(data.error);
-        } else {
-            console.log("Pagination Data:", data.current_page, data.previous_page, data.next_page);
-            currentPage = data.current_page || 1; 
-            displayResults({ results: data.recommendations });
-            addPaginationButtons(data); 
-        }
-    })
-    .catch(error => console.error("Fetch error:", error));
-
-
+    fetch(`${API_BASE_URL}/recommend/letterboxd?username=${encodeURIComponent(username)}&page=${currentPage}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Movies data:", data); 
+            if (data.error) {
+                displayError(data.error);
+            } else {
+                console.log("Pagination Data:", data.current_page, data.previous_page, data.next_page);
+                currentPage = data.current_page || 1; 
+                displayResults({ results: data.recommendations });
+                addPaginationButtons(data); 
+            }
+        })
+        .catch(error => console.error("Fetch error:", error));
 }
+
 
 // Function to display results in a table
 function displayResults(data) {
