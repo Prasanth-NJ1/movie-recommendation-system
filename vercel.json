@@ -5,11 +5,5 @@
     ],
     "routes": [
         { "src": "/(.*)", "dest": "wsgi.py" }
-    ],
-    "functions": {
-        "wsgi.py": {
-            "runtime": "python3.9",
-            "includeFiles": ["app.py", "requirements.txt", "backend/**", "frontend/**"]
-        }
-    }
+    ]
 }
