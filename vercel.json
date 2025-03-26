@@ -2,29 +2,12 @@
     "version": 2,
     "builds": [
         {
+            "src": "vercel-build.sh",
+            "use": "@vercel/static"
+        },
+        {
             "src": "wsgi.py",
             "use": "@vercel/python"
-        },
-        {
-            "src": "frontend/**",
-            "use": "@vercel/static"
         }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "wsgi.py"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "frontend/$1"
-        }
-    ],
-    "ignoreFiles": [
-        "venv/**",
-        "backend/venv/**",
-        ".gitignore",
-        ".vscode/**",
-        "__pycache__/**"
     ]
 }
