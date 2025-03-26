@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from recommendation.genre_based import get_movies_by_genre
-from recommendation.movie_based import get_movie_recommendations
-from recommendation.letterboxd_based import get_scraped_movies_collection, get_most_watched_genre, recommend_movies_from_db, recommend_movies_from_tmdb  
+from backend.recommendation.genre_based import get_movies_by_genre
+from backend.recommendation.movie_based import get_movie_recommendations
+from backend.recommendation.letterboxd_based import get_scraped_movies_collection, get_most_watched_genre, recommend_movies_from_db, recommend_movies_from_tmdb  
 import requests
 import subprocess
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
 
 app = Flask(__name__)
 CORS(app) # Allow frontend requests
