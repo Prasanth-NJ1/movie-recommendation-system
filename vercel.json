@@ -8,14 +8,6 @@
         {"src": "/api/(.*)", "dest": "wsgi.py"},
         {"src": "/(.*)", "dest": "frontend/$1"}
     ],
-    "includeFiles": [
-        "wsgi.py",
-        "app.py",
-        "requirements.txt",
-        "frontend/**",
-        "recommendation/**",
-        "data/**"
-    ],
     "ignoreFiles": [
         "venv/**",
         ".gitignore",
