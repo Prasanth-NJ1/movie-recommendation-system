@@ -1,9 +1,19 @@
 {
     "version": 2,
     "builds": [
-        { "src": "wsgi.py", "use": "@vercel/python" }
+        {
+            "src": "wsgi.py",
+            "use": "@vercel/python"
+        }
     ],
     "routes": [
-        { "src": "/recommend/.*", "dest": "wsgi.py" }
+        {
+            "src": "/recommend/(.*)",
+            "dest": "wsgi.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
+        }
     ]
 }
