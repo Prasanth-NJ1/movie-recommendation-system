@@ -1,7 +1,7 @@
 let currentPage = 1; 
 
 const API_BASE_URL = "https://movie-recommendation-system-ten.vercel.app";
-
+const loadingMessage = document.getElementById("loading");
 // Function to fetch movie recommendations based on title
 function getMovieRecommendations() {
     let movieTitle = document.getElementById('movie-input').value.trim();
@@ -10,11 +10,17 @@ function getMovieRecommendations() {
         console.error("Error: No movie title provided");
         return;
     }
-
+    showLoading();
     fetch(`${API_BASE_URL}/recommend/movie?title=${encodeURIComponent(movieTitle)}&page=${currentPage}`)
         .then(response => response.json())
-        .then(data => displayResults(data))
-        .catch(error => console.error("Fetch error:", error));
+        .then(data => {
+            hideLoading(); // Hide loading message
+            displayResults(data);
+        })
+        .catch(error => {
+            hideLoading();
+            console.error("Fetch error:", error);
+        });
 }
 
 // Function to fetch recommendations based on genre
@@ -26,10 +32,18 @@ function getGenreRecommendations() {
         return;
     }
 
+    showLoading();
+
     fetch(`${API_BASE_URL}/recommend/genre?genre=${encodeURIComponent(genre)}&page=${currentPage}`)
         .then(response => response.json())
-        .then(data => displayResults(data))
-        .catch(error => console.error("Fetch error:", error));
+        .then(data => {
+            hideLoading();
+            displayResults(data);
+        })
+        .catch(error => {
+            hideLoading();
+            console.error("Fetch error:", error);
+        });
 }
 
 // Function to fetch recommendations based on Letterboxd username
@@ -41,20 +55,26 @@ function getLetterboxdRecommendations() {
         return;
     }
 
+    showLoading();
+
     fetch(`${API_BASE_URL}/recommend/letterboxd?username=${encodeURIComponent(username)}&page=${currentPage}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Movies data:", data); 
+            hideLoading();
+            console.log("Movies data:", data);
             if (data.error) {
                 displayError(data.error);
             } else {
                 console.log("Pagination Data:", data.current_page, data.previous_page, data.next_page);
-                currentPage = data.current_page || 1; 
+                currentPage = data.current_page || 1;
                 displayResults({ results: data.recommendations });
-                addPaginationButtons(data); 
+                addPaginationButtons(data);
             }
         })
-        .catch(error => console.error("Fetch error:", error));
+        .catch(error => {
+            hideLoading();
+            console.error("Fetch error:", error);
+        });
 }
 
 
@@ -159,4 +179,14 @@ function reloadCurrentRecommendations() {
     } else if (username) {
         getLetterboxdRecommendations();
     }
+}
+
+function showLoading() {
+    loadingMessage.style.display = "block";
+    document.getElementById("results").innerHTML = ""; // Clear previous results
+}
+
+// Function to hide loading message
+function hideLoading() {
+    loadingMessage.style.display = "none";
 }

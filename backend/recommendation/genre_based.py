@@ -1,10 +1,55 @@
 import sys
 import os
+import requests
 
-# Add backend folder to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from db_config import get_movie_collection  
+
+
+TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
+
+GENRE_MAP = {}
+
+
+def get_tmdb_genre_map():
+    """Fetch and store TMDb genre ID to name mapping."""
+    global GENRE_MAP
+    url = f"https://api.themoviedb.org/3/genre/movie/list?api_key={TMDB_API_KEY}"
+    response = requests.get(url).json()
+
+    if "genres" in response:
+        GENRE_MAP = {genre["name"].lower(): genre["id"] for genre in response["genres"]}
+
+
+def fetch_movies_from_tmdb(genre_name, page=1, limit=10):
+    """Fetch movies from TMDb based on genre if not found in the local database."""
+    if not GENRE_MAP:
+        get_tmdb_genre_map()
+
+    genre_id = GENRE_MAP.get(genre_name.lower())
+
+    if not genre_id:
+        return []
+
+    url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&page={page}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        return []
+
+    movies = response.json().get("results", [])[:limit]
+
+    return [
+        {
+            "title": movie["title"],
+            "year": movie.get("release_date", "N/A")[:4],
+            "genre": [genre_name],  # Since TMDb doesn't return genre names directly
+            "rating": movie.get("vote_average", "N/A")
+        }
+        for movie in movies
+    ]
+
 
 def get_movies_by_genre(genre, limit=10, page=1):
     collection = get_movie_collection()  # Get the correct collection

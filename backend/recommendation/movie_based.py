@@ -1,10 +1,32 @@
 import sys
 import os
-
+import requests
 # Add backend folder to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from db_config import get_db
+
+TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
+
+def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
+    """Fetch similar movies from TMDb if not found in the local database."""
+    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}&page={page}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        return []
+
+    movies = response.json().get("results", [])[:limit]
+
+    return [
+        {
+            "title": movie["title"],
+            "year": movie.get("release_date", "N/A")[:4],
+            "genre": [],  # TMDb doesn't always return genre names in search
+            "rating": movie.get("vote_average", "N/A")
+        }
+        for movie in movies
+    ]
 
 
 def get_movie_recommendations(movie_title, page=1, limit=10):
