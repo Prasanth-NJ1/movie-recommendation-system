@@ -9,19 +9,23 @@ from db_config import get_db
 TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
-    """Fetch similar movies from TMDb if not found in the local database."""
-    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}&page={page}"
-    response = requests.get(url)
+    """Fetch similar movies from TMDb using the movie ID."""
+    
+    search_url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}"
+    search_response = requests.get(search_url)
 
-    if response.status_code != 200:
-        return []
+    if search_response.status_code != 200 or not search_response.json().get("results"):
+        return []  
 
-    movies = response.json().get("results", [])[:limit]
+    movie_id = search_response.json()["results"][0]["id"]
 
-    filtered_movies = [
-        movie for movie in movies
-        if movie["title"].strip().lower() != movie_title.strip().lower()
-    ][:limit]  # Ensure we return only `limit` number of movies
+    similar_url = f"https://api.themoviedb.org/3/movie/{movie_id}/similar?api_key={TMDB_API_KEY}&page={page}"
+    similar_response = requests.get(similar_url)
+
+    if similar_response.status_code != 200:
+        return []  
+
+    movies = similar_response.json().get("results", [])[:limit]
 
     return [
         {
@@ -30,10 +34,9 @@ def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
             "genre": [], 
             "rating": movie.get("vote_average", "N/A")
         }
-        for movie in filtered_movies
+        for movie in movies
+        if movie["title"].strip().lower() != movie_title.strip().lower()  # Exclude the searched movie
     ]
-
-
 def get_movie_recommendations(movie_title, page=1, limit=10):
     db = get_db()
     collection = db["imdb_movies"]
