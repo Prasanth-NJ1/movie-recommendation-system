@@ -19,8 +19,7 @@ def get_tmdb_genre_map():
     response = requests.get(url).json()
 
     if "genres" in response:
-        GENRE_MAP = {genre["name"].lower(): genre["id"] for genre in response["genres"]}
-
+        GENRE_MAP = {genre["id"]: genre["name"] for genre in response["genres"]}
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
     """Fetch similar movies from TMDb, including genres and proper pagination."""
