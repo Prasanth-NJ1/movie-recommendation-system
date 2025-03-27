@@ -1,7 +1,7 @@
 import sys
 import os
 import requests
-# Add backend folder to Python path
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from db_config import get_db
@@ -17,12 +17,17 @@ def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
         return []
 
     movies = response.json().get("results", [])[:limit]
+    
+    filtered_movies = [
+        movie for movie in movies
+        if movie["title"].strip().lower() != movie_title.strip().lower()
+    ][:limit]  # Ensure we return only `limit` number of movies
 
     return [
         {
             "title": movie["title"],
             "year": movie.get("release_date", "N/A")[:4],
-            "genre": [],  # TMDb doesn't always return genre names in search
+            "genre": [], 
             "rating": movie.get("vote_average", "N/A")
         }
         for movie in movies
