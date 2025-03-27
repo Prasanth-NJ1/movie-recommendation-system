@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from .recommendation.genre_based import get_movies_by_genre,fetch_movies_from_tmdb
+from .recommendation.genre_based import get_movies_by_genre
 from .recommendation.movie_based import get_movie_recommendations,fetch_similar_movies_from_tmdb
 from .recommendation.letterboxd_based import get_scraped_movies_collection, get_most_watched_genre, recommend_movies_from_db, recommend_movies_from_tmdb  
 import requests
@@ -25,14 +25,7 @@ def recommend_by_genre():
     page = int(request.args.get('page', 1))
     if not genre:
         return jsonify({"error": "Genre is required"}), 400
-    recommendations = get_movies_by_genre(genre, page=page)
-
-    # If no results from DB, fetch from TMDb
-    if not recommendations["results"]:
-        recommendations["results"] = fetch_movies_from_tmdb(genre, page=page)
-        recommendations["source"] = "tmdb"
-
-    return jsonify(recommendations)
+    return jsonify(get_movies_by_genre(genre, page=page))
 
 @app.route('/recommend/movie', methods=['GET'])
 def recommend_by_movie():
