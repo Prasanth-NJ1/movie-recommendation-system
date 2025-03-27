@@ -6,17 +6,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from db_config import get_db
 
+# TMDb API Key
 TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
-    """Fetch similar movies from TMDb using the movie ID with pagination."""
+    """Fetch similar movies from TMDb using the movie ID."""
     
     # Step 1: Get movie ID from TMDb search
     search_url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}"
     search_response = requests.get(search_url)
 
     if search_response.status_code != 200 or not search_response.json().get("results"):
-        return {"error": "Movie not found on TMDb."}  
+        return []  # Return empty list if search fails or no results
 
     # Get the first matching movie ID
     movie_id = search_response.json()["results"][0]["id"]
@@ -26,31 +27,20 @@ def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
     similar_response = requests.get(similar_url)
 
     if similar_response.status_code != 200:
-        return {"error": "Failed to fetch similar movies from TMDb."}  
+        return []  # Return empty if fetching similar movies fails
 
-    # Extract data
-    similar_data = similar_response.json()
-    movies = similar_data.get("results", [])[:limit]  # Limit results
-    total_pages = similar_data.get("total_pages", 1)   # Total pages from API
+    movies = similar_response.json().get("results", [])[:limit]
 
-    formatted_movies = [
+    return [
         {
             "title": movie["title"],
             "year": movie.get("release_date", "N/A")[:4],
-            "genre": [],  # Fetch genres separately if needed
+            "genre": [],  # Genres are not fetched here, but we can enhance this if needed
             "rating": movie.get("vote_average", "N/A")
         }
         for movie in movies
         if movie["title"].strip().lower() != movie_title.strip().lower()  # Exclude the searched movie
     ]
-
-    return {
-        "current_page": page,
-        "total_pages": total_pages,
-        "next_page": page + 1 if page < total_pages else None,
-        "previous_page": page - 1 if page > 1 else None,
-        "results": formatted_movies
-    }
 def get_movie_recommendations(movie_title, page=1, limit=10):
     db = get_db()
     collection = db["imdb_movies"]
