@@ -22,34 +22,42 @@ def get_tmdb_genre_map():
         GENRE_MAP = {genre["name"].lower(): genre["id"] for genre in response["genres"]}
 
 
-def fetch_movies_from_tmdb(genre_name, page=1, limit=10):
-    """Fetch movies from TMDb based on genre if not found in the local database."""
-    if not GENRE_MAP:
+def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
+    """Fetch similar movies from TMDb, including genres and proper pagination."""
+    if not GENRE_MAP:  # Ensure genre map is loaded
         get_tmdb_genre_map()
 
-    genre_id = GENRE_MAP.get(genre_name.lower())
-
-    if not genre_id:
-        return []
-
-    url = f"https://api.themoviedb.org/3/discover/movie?api_key={TMDB_API_KEY}&with_genres={genre_id}&page={page}"
+    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}&page={page}"
     response = requests.get(url)
 
     if response.status_code != 200:
-        return []
+        return {"error": "Failed to fetch data from TMDb", "results": []}
 
-    movies = response.json().get("results", [])[:limit]
+    movies = response.json()
+    total_pages = movies.get("total_pages", 1)  # Total TMDb pages available
+    total_results = movies.get("total_results", 0)
 
-    return [
-        {
-            "title": movie["title"],
-            "year": movie.get("release_date", "N/A")[:4],
-            "genre": [genre_name],  # Since TMDb doesn't return genre names directly
-            "rating": movie.get("vote_average", "N/A")
-        }
-        for movie in movies
-    ]
+    filtered_movies = [
+        movie for movie in movies.get("results", [])
+        if movie["title"].strip().lower() != movie_title.strip().lower()
+    ][:limit]  # Ensure we return only `limit` number of movies
 
+    return {
+        "current_page": page,
+        "total_pages": total_pages,
+        "next_page": page + 1 if page < total_pages else None,
+        "previous_page": page - 1 if page > 1 else None,
+        "total_results": total_results,
+        "results": [
+            {
+                "title": movie["title"],
+                "year": movie.get("release_date", "N/A")[:4],
+                "genre": [GENRE_MAP.get(genre_id, "Unknown") for genre_id in movie.get("genre_ids", [])],
+                "rating": movie.get("vote_average", "N/A")
+            }
+            for movie in filtered_movies
+        ]
+    }
 
 def get_movies_by_genre(genre, limit=10, page=1):
     collection = get_movie_collection()  # Get the correct collection
