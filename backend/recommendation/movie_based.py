@@ -10,48 +10,50 @@ from db_config import get_db
 TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
-    """Fetch similar movies from TMDb using the movie ID with pagination."""
-    
-    # Step 1: Get movie ID from TMDb search
+    """Fetch similar movies from TMDb using the movie ID and include pagination."""
+
+    # Step 1: Get movie ID
     search_url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}"
     search_response = requests.get(search_url)
 
     if search_response.status_code != 200 or not search_response.json().get("results"):
-        return {"error": "Movie not found on TMDb."}  
+        return {"results": [], "current_page": page, "total_pages": 1, "next_page": None, "previous_page": None}
 
-    # Get the first matching movie ID
     movie_id = search_response.json()["results"][0]["id"]
 
-    # Step 2: Fetch similar movies using the movie ID
+    # Step 2: Fetch similar movies
     similar_url = f"https://api.themoviedb.org/3/movie/{movie_id}/similar?api_key={TMDB_API_KEY}&page={page}"
     similar_response = requests.get(similar_url)
 
     if similar_response.status_code != 200:
-        return {"error": "Failed to fetch similar movies from TMDb."}  
+        return {"results": [], "current_page": page, "total_pages": 1, "next_page": None, "previous_page": None}
 
-    # Extract data
-    similar_data = similar_response.json()
-    movies = similar_data.get("results", [])[:limit]  # Limit results
-    total_pages = similar_data.get("total_pages", 1)   # Total pages from API
+    tmdb_data = similar_response.json()
+    movies = tmdb_data.get("results", [])
 
     formatted_movies = [
         {
             "title": movie["title"],
             "year": movie.get("release_date", "N/A")[:4],
-            "genre": [],  # Fetch genres separately if needed
+            "genre": [],  # TMDb API requires a separate call for genres
             "rating": movie.get("vote_average", "N/A")
         }
-        for movie in formatted_movies
-        if movie["title"].strip().lower() != movie_title.strip().lower()  # Exclude the searched movie
-    ]
+        for movie in movies if movie["title"].strip().lower() != movie_title.strip().lower()
+    ][:limit]  # Ensure only `limit` movies are returned
+
+    # Pagination details
+    total_pages = tmdb_data.get("total_pages", 1)
+    next_page = page + 1 if page < total_pages else None
+    previous_page = page - 1 if page > 1 else None
 
     return {
+        "results": formatted_movies,
         "current_page": page,
         "total_pages": total_pages,
-        "next_page": page + 1 if page < total_pages else None,
-        "previous_page": page - 1 if page > 1 else None,
-        "results": formatted_movies
+        "next_page": next_page,
+        "previous_page": previous_page
     }
+
 def get_movie_recommendations(movie_title, page=1, limit=10):
     db = get_db()
     collection = db["imdb_movies"]

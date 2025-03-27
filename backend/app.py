@@ -37,7 +37,8 @@ def recommend_by_movie():
 
     # If no results from DB, fetch from TMDb
     if not recommendations["results"]:
-        recommendations["results"] = fetch_similar_movies_from_tmdb(title, page=page)
+        tmdb_results = fetch_similar_movies_from_tmdb(title, page=page)
+        recommendations.update(tmdb_results)
         recommendations["source"] = "tmdb"
 
     return jsonify(recommendations)
