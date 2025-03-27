@@ -10,37 +10,59 @@ from db_config import get_db
 TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
-    """Fetch similar movies from TMDb using the movie ID."""
-    
-    # Step 1: Get movie ID from TMDb search
+    """Fetch similar movies from TMDb using the movie ID with pagination support."""
+
     search_url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}"
     search_response = requests.get(search_url)
 
     if search_response.status_code != 200 or not search_response.json().get("results"):
-        return []  # Return empty list if search fails or no results
+        return {
+            "current_page": page,
+            "total_pages": 0,
+            "next_page": None,
+            "previous_page": page - 1 if page > 1 else None,
+            "results": [],
+            "error": "Movie not found in TMDb."
+        }
 
-    # Get the first matching movie ID
     movie_id = search_response.json()["results"][0]["id"]
 
-    # Step 2: Fetch similar movies using the movie ID
     similar_url = f"https://api.themoviedb.org/3/movie/{movie_id}/similar?api_key={TMDB_API_KEY}&page={page}"
     similar_response = requests.get(similar_url)
 
     if similar_response.status_code != 200:
-        return []  # Return empty if fetching similar movies fails
+        return {
+            "current_page": page,
+            "total_pages": 0,
+            "next_page": None,
+            "previous_page": page - 1 if page > 1 else None,
+            "results": [],
+            "error": "Failed to fetch similar movies from TMDb."
+        }
 
-    movies = similar_response.json().get("results", [])[:limit]
+    data = similar_response.json()
+    movies = data.get("results", [])
+    total_pages = data.get("total_pages", 1)  # Total pages from TMDb API
 
-    return [
+    filtered_movies = [
         {
             "title": movie["title"],
             "year": movie.get("release_date", "N/A")[:4],
-            "genre": [],  # Genres are not fetched here, but we can enhance this if needed
+            "genre": [],  # TMDb API provides genre IDs, fetching actual names would need another API call
             "rating": movie.get("vote_average", "N/A")
         }
         for movie in movies
-        if movie["title"].strip().lower() != movie_title.strip().lower()  # Exclude the searched movie
-    ]
+        if movie["title"].strip().lower() != movie_title.strip().lower()
+    ][:limit]  # Ensure only `limit` number of movies
+
+    return {
+        "current_page": page,
+        "total_pages": total_pages,
+        "next_page": page + 1 if page < total_pages else None,
+        "previous_page": page - 1 if page > 1 else None,
+        "results": filtered_movies
+    }
+
 def get_movie_recommendations(movie_title, page=1, limit=10):
     db = get_db()
     collection = db["imdb_movies"]
