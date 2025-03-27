@@ -17,7 +17,7 @@ def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
         return []
 
     movies = response.json().get("results", [])[:limit]
-    
+
     filtered_movies = [
         movie for movie in movies
         if movie["title"].strip().lower() != movie_title.strip().lower()
@@ -30,7 +30,7 @@ def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
             "genre": [], 
             "rating": movie.get("vote_average", "N/A")
         }
-        for movie in movies
+        for movie in filtered_movies
     ]
 
 
