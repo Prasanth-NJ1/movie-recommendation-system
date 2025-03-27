@@ -19,44 +19,40 @@ def get_tmdb_genre_map():
     response = requests.get(url).json()
 
     if "genres" in response:
-        GENRE_MAP = {genre["id"]: genre["name"] for genre in response["genres"]}
+        GENRE_MAP = {genre["name"]: genre["name"] for genre in response["genres"]}
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
-    """Fetch similar movies from TMDb, including genres and proper pagination."""
-    if not GENRE_MAP:  # Ensure genre map is loaded
-        get_tmdb_genre_map()
+    """Fetch similar movies from TMDb using the movie ID."""
+    
+    # Step 1: Get movie ID from TMDb search
+    search_url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}"
+    search_response = requests.get(search_url)
 
-    url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={requests.utils.quote(movie_title)}&page={page}"
-    response = requests.get(url)
+    if search_response.status_code != 200 or not search_response.json().get("results"):
+        return []  # Return empty list if search fails or no results
 
-    if response.status_code != 200:
-        return {"error": "Failed to fetch data from TMDb", "results": []}
+    # Get the first matching movie ID
+    movie_id = search_response.json()["results"][0]["id"]
 
-    movies = response.json()
-    total_pages = movies.get("total_pages", 1)  # Total TMDb pages available
-    total_results = movies.get("total_results", 0)
+    # Step 2: Fetch similar movies using the movie ID
+    similar_url = f"https://api.themoviedb.org/3/movie/{movie_id}/similar?api_key={TMDB_API_KEY}&page={page}"
+    similar_response = requests.get(similar_url)
 
-    filtered_movies = [
-        movie for movie in movies.get("results", [])
-        if movie["title"].strip().lower() != movie_title.strip().lower()
-    ][:limit]  # Ensure we return only `limit` number of movies
+    if similar_response.status_code != 200:
+        return []  # Return empty if fetching similar movies fails
 
-    return {
-        "current_page": page,
-        "total_pages": total_pages,
-        "next_page": page + 1 if page < total_pages else None,
-        "previous_page": page - 1 if page > 1 else None,
-        "total_results": total_results,
-        "results": [
-            {
-                "title": movie["title"],
-                "year": movie.get("release_date", "N/A")[:4],
-                "genre": [GENRE_MAP.get(genre_id, "Unknown") for genre_id in movie.get("genre_ids", [])],
-                "rating": movie.get("vote_average", "N/A")
-            }
-            for movie in filtered_movies
-        ]
-    }
+    movies = similar_response.json().get("results", [])[:limit]
+
+    return [
+        {
+            "title": movie["title"],
+            "year": movie.get("release_date", "N/A")[:4],
+            "genre": [],  # Genres are not fetched here, but we can enhance this if needed
+            "rating": movie.get("vote_average", "N/A")
+        }
+        for movie in movies
+        if movie["title"].strip().lower() != movie_title.strip().lower()  # Exclude the searched movie
+    ]
 
 def get_movies_by_genre(genre, limit=10, page=1):
     collection = get_movie_collection()  # Get the correct collection
