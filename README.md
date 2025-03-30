@@ -14,7 +14,9 @@ It fetches movie data from Letterboxd, OMDb, and TMDb and stores it in MongoDB f
 ## Setup Instructions  
 1. Clone the repository `https://github.com/Prasanth-NJ1/movie-recommendation-system.git`
 2. Install dependencies: `pip install -r requirements.txt`  
-3. Start the Flask Server `python app.py`  
+3. Change API Keys and DB connection string in files
+4. Create venv file
+5. Start the Flask Server `python app.py`  
 
 ## Example Usage
 Run the following commands in your command prompt after the Flask started running 

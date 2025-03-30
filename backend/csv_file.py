@@ -2,7 +2,7 @@ import requests
 import csv
 import time
 
-TMDB_API_KEY = "4920a5b79e57b1ac32a0a8cde05c520e"  # Replace with your TMDb API key
+TMDB_API_KEY = "YOUR_API_HERE"  # Replace with your TMDb API key
 TMDB_URL = "https://api.themoviedb.org/3/movie/top_rated"
 
 MOVIE_LIMIT = 8000  # Target count

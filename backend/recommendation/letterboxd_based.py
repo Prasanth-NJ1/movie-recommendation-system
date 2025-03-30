@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from db_config import get_scraped_movies_collection, get_movie_collection  
 
 # TMDb API Key
-TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
+TMDB_API_KEY = "YOUR_API_HERE"
 
 GENRE_MAP = {}
 
