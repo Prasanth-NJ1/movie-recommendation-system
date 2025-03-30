@@ -3,17 +3,12 @@ import csv
 from pymongo import MongoClient
 import time
 import pandas as pd
-import os
-from dotenv import load_dotenv
 
-def configure():
-    load_dotenv()
+client = MongoClient("YOUR_CONNECTION STRING")
+db = client["DB_NAME"]
+collection = db["DB_COLLECTION"]
 
-client = MongoClient(os.getenv('DB_STRING'))
-db = client["movies_database"]
-collection = db["imdb_movies"]
-
-OMDB_API_KEY = os.getenv('OMDB_API')  # Replace with your API key
+OMDB_API_KEY = "YOUR_API_HERE"  # Replace with your API key
 OMDB_URL = "http://www.omdbapi.com"
 
 df = pd.read_csv("tmdb_movies.csv")  

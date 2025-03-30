@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from db_config import get_db
 
 
-TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
+TMDB_API_KEY = "YOUR_API_HERE"
 
 def fetch_similar_movies_from_tmdb(movie_title, page=1, limit=10):
     """Fetch similar movies from TMDb using the movie ID and include pagination."""

@@ -1,7 +1,7 @@
 import requests
 
-TMDB_API_KEY = "a9cca56ed16bad2ba4d7ff57c2f9c89e"
-
+TMDB_API_KEY = "YOUR API HERE"  #replace your api
+ 
 
 GENRE_MAP = {}
 
